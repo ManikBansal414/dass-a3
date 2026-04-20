@@ -18,7 +18,7 @@ android {
         buildConfigField(
             "String",
             "APP_IDENTIFIER",
-            "\"REPLACE_WITH_YOUR_ROLLNUMBER_OR_TEAM_ROLLNUMBERS\""
+            "\"2024101084.2024101103\""
         )
     }
 
