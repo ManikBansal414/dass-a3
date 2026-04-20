@@ -44,41 +44,148 @@ The project uses a local stub repository (no backend server required), so all fl
 
 ## Feature Overview
 
-### 1) Login and Role Flow
+### 1) Authentication and Session Flow
 
-- Role-based login for Student (Scholar) and Admin
-- Role-specific home/dashboard after successful login
-- Navigation restrictions for admin-only routes
+- Login screen supports role switch: Student (mapped internally to Scholar) and Admin.
+- Student credentials: `scholar@atelier.edu` / `atelier123`.
+- Admin credentials: `admin@atelier.edu` / `admin123`.
+- Invalid credentials show inline error banner and block navigation.
+- Successful login clears login route and lands on role home:
+    - Student -> `Dashboard`
+    - Admin -> `AdminDashboard`
+- Logout from either dashboard returns to Login and clears active stack.
 
-### 2) Dashboard Module
+### 2) Student Role Flows
 
-- Student dashboard:
-    - Critical updates
-    - Quick shortcuts
-    - Search-triggered navigation and discovery
-- Admin dashboard:
-    - Operational task launchers
-    - Conflict and admission management entry points
-    - Search-triggered navigation and discovery
+- Student Dashboard flow:
+    - View profile header, schedule snapshot, critical updates, latest news, active modules.
+    - Tap active module to mark it viewed.
+    - Open Timetable from shortcuts or bottom navigation.
+    - Open Profile from bottom navigation.
+    - Use in-dashboard search overlay:
+        - Navigate to Home, Schedule, Profile.
+        - Open matched course detail overlay.
 
-### 3) Timetable Module
+- Student Timetable flow:
+    - Select day from week selector or grid.
+    - Filter sessions by subject.
+    - View daily cards and student alerts card.
+    - Back/Home returns to Student Dashboard.
+    - Open Schedule Selection modal route.
+    - Open Week Selection route.
 
-- Student-facing timetable view
-- Day/subject filtering and readable schedule cards
-- Admin timetable builder with drag-drop placement
-- Conflict alerts and conflict resolution workflow
-- Undo support for key resolution/edit actions
+- Student Schedule Selection flow:
+    - Select available slot (occupied slots are locked).
+    - Confirm selection and return to Timetable.
 
-### 4) Student Admission Module
+- Student Week Selection flow:
+    - Open active academic week and return to Timetable.
 
-- Multi-step student application flow:
-    - Personal details
-    - Guardian details
-    - Academic history
-    - Review and submit
-- Hard validation for required fields before progression
-- Admin review actions: Approve / Pending / Reject
-- Status-aware feedback and role-aware return paths
+- Student Profile flow:
+    - View scholar identity and academic summary.
+    - Update language and timezone preferences.
+    - View announcements feed.
+    - Navigate Home/Schedule via bottom navigation.
+
+### 3) Admin Role Flows
+
+- Admin Dashboard flow:
+    - View operational stats, critical updates, latest news.
+    - Launch operational tasks:
+        - Admissions Intake
+        - Timetable Builder
+        - Schedule Conflicts
+        - Review Admissions
+    - Open Profile from bottom navigation.
+    - Use in-dashboard search overlay:
+        - Navigate to Home, Schedule (Builder), Profile.
+        - Open matched course detail overlay.
+
+- Admin Timetable Builder flow:
+    - Choose target batch.
+    - Drag course cards from pool and drop into timetable slots.
+    - Undo last placement.
+    - Clear draft placements.
+    - Save schedule to append timetable entries and return to Admin Dashboard.
+
+- Admin Create Timetable Entry flow:
+    - Fill batch, subject, teacher, room, day, time window, seats.
+    - Save to create new entry.
+    - Cancel returns without save.
+
+- Admin Conflict Alerts flow:
+    - View unresolved/resolved conflict cards and counters.
+    - Open conflict resolution details for a selected conflict.
+    - Open Timetable Builder for manual repair.
+
+- Admin Conflict Resolution flow:
+    - View selected conflict severity, details, recommendation, AI summary.
+    - Resolve by applying AI recommendation or manual resolve action.
+    - Undo last resolved conflict.
+    - Open Timetable Builder directly from resolution screen.
+
+- Admin Admissions Intake (4-step wizard):
+    - Step 1 Personal Details:
+        - Required validations: name, valid past DOB, valid phone, category, address, declaration.
+    - Step 2 Guardian Information:
+        - Required validations: guardian identity, relationship, valid phones, valid email, emergency contact.
+    - Step 3 Academic History:
+        - Required validations: institution, board, graduation year, GPA range, supporting documents, declaration.
+    - Step 4 Review & Submit:
+        - Review all sections.
+        - Jump back to edit personal/guardian/academic sections.
+        - Submit application to Admission Status.
+
+- Admin Admissions List and Review flow:
+    - View admissions list with Pending/Approved/Rejected counts.
+    - Select application to open detailed review.
+    - Edit admission fields (phone, address, guardian, emergency contact) and save.
+    - Decision controls:
+        - Approve -> Admission Status
+        - Reject -> Admission Status
+        - Keep Pending (in-place state update)
+        - Undo last status change
+
+- Admin Profile/System Settings flow:
+    - Update global config: country, currency, timezone, language, graduation rule, category rule.
+    - Toggle features: auto unique ID and SMS alerts.
+    - Add Course entries.
+    - Add Subject entries.
+    - Add Batch entries and transfer rules.
+
+### 4) Shared and Cross-Role Flows
+
+- Admission Status flow (shared route):
+    - Reads selected admission and current decision state.
+    - Shows next steps based on status (Pending/Approved/Rejected).
+    - Back button is role-aware:
+        - Admin -> Admissions List
+        - Student -> Dashboard
+
+- Role-denied guard flow (`RoleDeniedScreen`):
+    - Student blocked from:
+        - Timetable Builder
+        - Create Timetable Entry
+        - Conflict Alerts/Resolution
+        - Admission intake steps
+        - Admissions list and admin review
+    - Admin blocked from Student Timetable view route.
+
+- Undo-capable flows:
+    - Undo last admission status decision.
+    - Undo last resolved conflict.
+    - Undo last timetable draft placement in Builder.
+
+- Navigation behavior rules:
+    - `launchSingleTop` is used to prevent duplicate destinations in stack.
+    - Home routing is role-aware (`Dashboard` for Student, `AdminDashboard` for Admin).
+
+### 5) Current Scope and Limits (Implemented Behavior)
+
+- Data is local in-memory (stub repository + ViewModel state).
+- No backend API integration.
+- No persistent login/session token storage across app restarts.
+- Credentials are demo credentials hardcoded for assignment prototype usage.
 
 ## Prerequisites
 
